@@ -8,6 +8,27 @@ with open('Configs\db_config.json', 'r') as f:
 
 app = Flask(__name__)
 
+#Check to see if valid student Id and returns boolean
+def Stud_id_check(Stud_id):
+    if Stud_id[0:3] == "100" and len(Stud_id) == 7:
+        return True
+    else:
+        return False
+
+#Check to see if valid Lecturer Id and returns boolean
+def Lec_id_check(Lec_id):
+    if Lec_id[0:3] == "100" and len(Lec_id) == 7:
+        return True
+    else:
+        return False
+
+#Check to see if valid Admin Id and returns boolean
+def Admin_id_check(Admin_id):
+    if Admin_id[0:3] == "100" and len(Admin_id) == 7:
+        return True
+    else:
+        return False
+    
 @app.route('/', methods=['GET'])
 def hello_world():
     return "hello world"
@@ -38,13 +59,13 @@ def register_user():
     User_id = content['User_ID']
     print(content['Password'])
 
-    if User_id[0:3] == "620" and len(User_id) == 9:
+    if Stud_id_check(User_id):
         return ("Student")
     
-    elif User_id[0:3] == "100" and len(User_id) == 6:
+    elif Lec_id_check(User_id):
         return ("Lecturer")
     
-    elif User_id[0:3] == "999" and len(User_id) == 8:
+    elif Admin_id_check(User_id):
         return ("Admin")
     
     else:
@@ -64,13 +85,13 @@ def User_login():
     User_id = content['User_ID']
     print(User_id,content['Password'])
 
-    if User_id[0:3] == "620" and len(User_id) == 9:
+    if Stud_id_check(User_id):
         return ("Student")
     
-    elif User_id[0:3] == "100" and len(User_id) == 6:
+    elif Lec_id_check(User_id):
         return ("Lecturer")
     
-    elif User_id[0:3] == "999" and len(User_id) == 8:
+    elif Admin_id_check(User_id):
         return ("Admin")
     
     else:
@@ -91,7 +112,8 @@ def Create_Course():
     User_id = content['User_ID']
     print(User_id,content['Password'])
     
-    if User_id[0:3] == "999" and len(User_id) == 8:
+    
+    if Admin_id_check(User_id):
         return ("Admin")
     
     else:
@@ -100,32 +122,25 @@ def Create_Course():
 @app.route('/View_Courses', methods=['Get'])
 def View_Courses():
 
-    content = request.json
-
-    
-    if User_id[0:3] == "999" and len(User_id) == 8:
-        return ("Admin")
-    
-    else:
-        return "Invalid User type"
+    pass
 
 @app.route('/View_Courses/<User_id>', methods=['Get'])
 def View_Courses(User_id):
 
     content = request.json
     
-    if User_id[0:3] == "620" and len(User_id) == 9:
-        return View_Courses_Student(User_id)
+    if Stud_id_check(User_id):
+        return View_Courses_by_Student(User_id)
     
-    elif User_id[0:3] == "100" and len(User_id) == 6:
-        return View_Courses_Lecturer(User_id)
+    elif Lec_id_check(User_id):
+        return  View_Courses_by_Lecturer(User_id)
+    
 
-
-    def View_Courses_Student(User_id):
+    def View_Courses_by_Student(User_id):
         pass
     
     
-    def View_Courses_Lecturer(User_id):
+    def View_Courses_by_Lecturer(User_id):
         pass
 
 if __name__ == '__main__':
