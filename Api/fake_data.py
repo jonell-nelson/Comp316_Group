@@ -1,3 +1,4 @@
+import pandas as pd
 from faker import Faker
 import random 
 
@@ -42,7 +43,7 @@ subject_codes = [
 def insert_person(type,num):
     data = {}
     if type == "Student":
-        ids = [fake.unique.random_int(min=620000000, max=620999999) for _ in range(num)]
+        ids = [fake.unique.random_int(min=62000000000, max=62099999999) for _ in range(num)]
        
         first = [fake.first_name() for x in range(0,num)]
         last = [fake.last_name() for x in range(0,num)]
@@ -61,11 +62,10 @@ def insert_person(type,num):
         departs = [random.choice(subject_codes) for _ in range(0,num) ]
         data["LecturerID"] = ids
         data["Lecturer Name"] = name
-        data["Department"] = departs
 
         return data
     
-    elif type == "Lecturer":
+    elif type == "Admin":
         ids = [fake.unique.random_int(min=99900000, max=99999999) for _ in range(num)]
        
         name = [fake.name() for _ in range(0,num)]
@@ -73,7 +73,6 @@ def insert_person(type,num):
         departs = [random.choice(subject_codes) for _ in range(0,num) ]
         data["AdminID"] = ids
         data["Admin Name"] = name
-        data["Department"] = departs
 
         return data
 
@@ -112,25 +111,27 @@ def insert_course(num):
 def teaches(lecturers,courses):
     lec_data,course_data = [],[]
 
-    if len(lecturers) > len(courses):
+    if not(len(lecturers) < len(courses)):
         print("Number of courses must exceed number of lecturers")
+        exit(0)
+    if not((5 * len(lecturers)) >= len(courses)):
+        print("Number of courses must be less or equal to that 5 times number of lecturers")
         exit(0)
     random.shuffle(courses)
 
     for i, lecturer in enumerate(lecturers):
         lec_data.append(lecturer)
         course_data.append(courses[i]) 
-    
 
     for course in courses[len(lecturers):]:
         lec_data.append(random.choice(lecturers))
         course_data.append(course) 
     
-    data = {
+    data = pd.DataFrame({
         "Course ID": course_data,
         "Lecturer ID": lec_data
-        }
-    
+        })
+
     return data
 
 def enroll(students,courses):
@@ -139,24 +140,22 @@ def enroll(students,courses):
     for course in courses:
 
         student = (random.choice(students))
-        num_course = random.randint(3,6)
+        num_course = random.randint(3,3)
     
         for _ in range(num_course):
             stu_data.append(student)
             course_data.append(random.choice(courses)) 
-            grade.append(random.randint(0,100))
     
-    data = {
+    data = pd.DataFrame({
         "CourseID": course_data,
         "StudentID": stu_data,
-        "Grade" : grade
-        }
+        })
     
     return data
 
 
 def inserts(students,lecturers,courses,teach,enroll):       
-    with open('D:/sql/Lab2_inserts.sql',"w") as sql:
+    with open('Api/Sql_inserts.sql',"w") as sql:
 
         print("-- Inserting into Student Table --")
 
@@ -188,12 +187,21 @@ def inserts(students,lecturers,courses,teach,enroll):
 
 if __name__ == '__main__':
 
-    students = insert_person("Student",100000)
-    Lecturers = insert_person("Lecturer",60)
-    courses = insert_course(200)
-    teach = teaches(Lecturers["LecturerID"],courses["Course ID"])
-    grade = enroll(students["StudentID"],courses["Course ID"])
+    students = pd.DataFrame(insert_person("Student",100000))
+    Lecturers = pd.DataFrame(insert_person("Lecturer",2))
+    admin = pd.DataFrame(insert_person("Admin",1))
+    courses = pd.DataFrame(insert_course(8))
+    #teach = teaches(Lecturers.loc[:,("LecturerID")],courses.loc[:,"Course ID"])
+    #grade = enroll(students["StudentID"],courses["Course ID"])
 
 
-    inserts(students,Lecturers,courses,teach,grade)
 
+    #inserts(students,Lecturers,courses,teach,grade)
+
+    print(students)
+    print("\n")
+    print(Lecturers)
+    print("\n")
+    print(admin)
+    print("\n")
+    print(courses)
