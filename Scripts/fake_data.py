@@ -43,7 +43,7 @@ subject_codes = [
 def insert_person(type,num):
     data = pd.DataFrame()
     if type == "Student":
-        ids = [fake.unique.random_int(min=62000000000, max=62099999999) for _ in range(num)]
+        ids = [fake.unique.random_int(min=620000000, max=629999999) for _ in range(num)]
        
         first = [fake.first_name() for x in range(0,num)]
         last = [fake.last_name() for x in range(0,num)]
@@ -147,21 +147,51 @@ def Student_course(students,courses):
                 if key not in c_s_id_list[str(s_id[i])]:
                     c_s_id_list[str(s_id[i])].append(str(key))
                     s_c_id_list[key] += 1
-                
-    print(s_c_id_list)
+                    S_C_num[i] += 1
     
     return (c_s_id_list)
 
-    
-    #print(s_id,"\n",c_id,"\n",S_C_num,"\n",C_S_num)
-
 def Lecturers_course(lecturers,courses):
-    pass
+    l_id = lecturers["LecturerID"].tolist()
+    c_id = courses["Course ID"].tolist()
+    L_C_num = [random.randint(1,5) for _ in range(len(l_id))]
+
+    l_c_id_list ={}
+    c_l_id_list ={}
+    for i in range(0,len(l_id)):
+        lst = []
+        for j in range(0,L_C_num[i]):
+
+            course = str(random.choice(c_id))
+            while course in lst:
+                course = str(random.choice(c_id))
+
+            lst.append(course)
+
+            keys = list(l_c_id_list.keys())
+
+            if course in (keys):
+                l_c_id_list[str(course)] += 1
+
+            else:
+                l_c_id_list[str(course)] = 1
+
+        c_l_id_list[str(l_id[i])] = lst
+    
+    for key in c_id:
+        while str(key) not in list(l_c_id_list.keys()):
+            i = random.randint(0,len(l_id)-1)
+            if L_C_num[i] <= 4:
+                c_l_id_list[str(l_id[i])].append(str(key))
+                l_c_id_list[str(key)] = 1
+                L_C_num[i] += 1
+            
+    return c_l_id_list
 
 if __name__ == '__main__':
 
-    students = insert_person("Student",100000)
-    lecturers = insert_person("Lecturer",80)
+    students = insert_person("Student",1000)
+    lecturers = insert_person("Lecturer",70)
     admin = insert_person("Admin",30)
     courses = insert_course(200)
 

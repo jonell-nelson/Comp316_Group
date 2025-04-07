@@ -10,7 +10,7 @@ app = Flask(__name__)
 
 #Check to see if valid student Id and returns boolean
 def Stud_id_check(Stud_id):
-    if Stud_id[0:3] == "620" and len(Stud_id) == 11:
+    if Stud_id[0:3] == "62" and len(Stud_id) == 9:
         return True
     else:
         return False
@@ -35,8 +35,8 @@ def hello_world():
 
 """
 Rule for Users:
-1. Student Id start with 620
-2. Student Id is 11 digits
+1. Student Id start with 62
+2. Student Id is 9 digits
 3. Lecturer Id starts with 100
 4. Lecturer Id is 6 digits long
 5. Lecturer Id starts with 999
