@@ -41,7 +41,7 @@ subject_codes = [
 ]
 
 def insert_person(type,num):
-    data = {}
+    data = pd.DataFrame()
     if type == "Student":
         ids = [fake.unique.random_int(min=62000000000, max=62099999999) for _ in range(num)]
        
@@ -77,7 +77,7 @@ def insert_person(type,num):
         return data
 
 def insert_course(num):
-    data = {}
+    data = pd.DataFrame()
     def generate_course_data(num):
         
         course_name = []
@@ -94,114 +94,77 @@ def insert_course(num):
         for course in courses:
             subject_code = course.split()[0]
             course_title = random.choice(course_names.get(subject_code, ["Special Topics"]))
-            course_code.append(course)
+            course_code.append(course.replace(" ",""))
             course_name.append(course_title)
 
-        return courses,course_name
+        return course_code,course_name
     
     ids = [fake.unique.random_int(min=0, max=99999) for _ in range(num)]
     course,course_title  = generate_course_data(num)
 
     data["Course ID"] = ids
-    data["Course Name"] = course_title
-    data["Course Code"] = course
+    data["Course_Name"] = course_title
+    data["Course_Code"] = course
 
     return data
 
-def teaches(lecturers,courses):
-    lec_data,course_data = [],[]
+def Student_course(students,courses):
 
-    if not(len(lecturers) < len(courses)):
-        print("Number of courses must exceed number of lecturers")
-        exit(0)
-    if not((5 * len(lecturers)) >= len(courses)):
-        print("Number of courses must be less or equal to that 5 times number of lecturers")
-        exit(0)
-    random.shuffle(courses)
+    s_id = students["StudentID"].tolist()
+    c_id = courses["Course ID"].tolist()
+    S_C_num = [random.randint(3,6) for _ in range(len(s_id))]
 
-    for i, lecturer in enumerate(lecturers):
-        lec_data.append(lecturer)
-        course_data.append(courses[i]) 
+    c_s_id_list ={}
+    s_c_id_list = {}
+    for i in range(0,len(s_id)):
+        lst = []
+        for j in range(0,S_C_num[i]):
 
-    for course in courses[len(lecturers):]:
-        lec_data.append(random.choice(lecturers))
-        course_data.append(course) 
+            keys = list(s_c_id_list.keys())
+            course = str(random.choice(c_id))
+
+            while course in lst:
+                course = str(random.choice(c_id))
+                
+
+            lst.append(course)
+
+            if course in (keys):
+                s_c_id_list[str(course)] += 1
+            else:
+                s_c_id_list[str(course)] = 1
+
+
+        c_s_id_list[str(s_id[i])] = lst
+
+
+    keys = list(s_c_id_list.keys())
+
+    for key in keys:
+        while (s_c_id_list[key]) < 10:
+            i = random.randint(0,len(s_id)-1)
+            if S_C_num[i] <= 5:
+                if key not in c_s_id_list[str(s_id[i])]:
+                    c_s_id_list[str(s_id[i])].append(str(key))
+                    s_c_id_list[key] += 1
+                
+    print(s_c_id_list)
     
-    data = pd.DataFrame({
-        "Course ID": course_data,
-        "Lecturer ID": lec_data
-        })
+    return (c_s_id_list)
 
-    return data
-
-def enroll(students,courses):
-    stu_data,course_data,grade = [],[],[]
     
-    for course in courses:
+    #print(s_id,"\n",c_id,"\n",S_C_num,"\n",C_S_num)
 
-        student = (random.choice(students))
-        num_course = random.randint(3,3)
-    
-        for _ in range(num_course):
-            stu_data.append(student)
-            course_data.append(random.choice(courses)) 
-    
-    data = pd.DataFrame({
-        "CourseID": course_data,
-        "StudentID": stu_data,
-        })
-    
-    return data
-
-
-def inserts(students,lecturers,courses,teach,enroll):       
-    with open('Api/Sql_inserts.sql',"w") as sql:
-
-        print("-- Inserting into Student Table --")
-
-        for i in range(len(students["StudentID"])):
-            sql.write(f"INSERT INTO Student (StudentID, FirstName, LastName) VALUES ('{students['StudentID'][i]}', '{students['First Name'][i]}', '{students['Last Name'][i]}');\n")
-        
-        sql.write("\n-- Inserting into Lecturer Table\n")
-
-        for i in range(len(lecturers["LecturerID"])):
-            sql.write(f"INSERT INTO Lecturer (LecID, LecName, Department) VALUES ('{lecturers['LecturerID'][i]}', '{lecturers['Lecturer Name'][i]}', '{lecturers['Department'][i]}');\n")
-        
-        sql.write("\n-- Inserting into Course Table\n")
-
-        for i in range(len(courses["Course ID"])):
-            sql.write(f"INSERT INTO Course (CourseID, CourseName, CourseCode) VALUES ('{courses['Course ID'][i]}', '{courses['Course Name'][i]}', '{courses['Course Code'][i]}');\n")
-        
-        sql.write("\n-- Inserting into Teaches Table\n")
-
-        for i in range(len(teach["Course ID"])):
-            sql.write(f"INSERT INTO Teaches (CourseID, LecID) VALUES ('{teach['Course ID'][i]}', '{teach['Lecturer ID'][i]}');\n")
-        
-        sql.write("\n-- Inserting into Enroll Table --\n")
-        for i in range(len(enroll["StudentID"])):
-            sql.write(f"INSERT INTO Enroll (StudentID, CourseID, Grade) VALUES ('{enroll['StudentID'][i]}', '{enroll['CourseID'][i]}', '{enroll['Grade'][i]}');\n")
-
-
-    print("-- SQL insert statements successfully written --")
-
+def Lecturers_course(lecturers,courses):
+    pass
 
 if __name__ == '__main__':
 
-    students = pd.DataFrame(insert_person("Student",100000))
-    Lecturers = pd.DataFrame(insert_person("Lecturer",2))
-    admin = pd.DataFrame(insert_person("Admin",1))
-    courses = pd.DataFrame(insert_course(8))
-    #teach = teaches(Lecturers.loc[:,("LecturerID")],courses.loc[:,"Course ID"])
-    #grade = enroll(students["StudentID"],courses["Course ID"])
+    students = insert_person("Student",100000)
+    lecturers = insert_person("Lecturer",80)
+    admin = insert_person("Admin",30)
+    courses = insert_course(200)
 
+    Student_Register  = (Student_course(students,courses))
 
-
-    #inserts(students,Lecturers,courses,teach,grade)
-
-    print(students)
-    print("\n")
-    print(Lecturers)
-    print("\n")
-    print(admin)
-    print("\n")
-    print(courses)
+    Lecturers_Register = Lecturers_course(lecturers,courses)
