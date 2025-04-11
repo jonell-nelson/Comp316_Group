@@ -1,4 +1,5 @@
 from flask import Flask, request, make_response
+import extra.py as ex
 import mysql.connector
 import json
 
@@ -8,26 +9,6 @@ with open('Configs\db_config.json', 'r') as f:
 
 app = Flask(__name__)
 
-#Check to see if valid student Id and returns boolean
-def Stud_id_check(Stud_id):
-    if Stud_id[0:3] == "62" and len(Stud_id) == 9:
-        return True
-    else:
-        return False
-
-#Check to see if valid Lecturer Id and returns boolean
-def Lec_id_check(Lec_id):
-    if Lec_id[0:3] == "100" and len(Lec_id) == 7:
-        return True
-    else:
-        return False
-
-#Check to see if valid Admin Id and returns boolean
-def Admin_id_check(Admin_id):
-    if Admin_id[0:3] == "999" and len(Admin_id) == 8:
-        return True
-    else:
-        return False
     
 @app.route('/', methods=['GET'])
 def hello_world():
@@ -47,7 +28,7 @@ Rule for Users:
 """The body for the request is 
 {
     "User_Name"  : "######",
-    "User_id": "620123456",
+    "User_id": "6201234567",
     password = "########"
 }
 """
@@ -59,13 +40,13 @@ def register_user():
     User_id = content['User_ID']
     print(content['Password'])
 
-    if Stud_id_check(User_id):
+    if ex.Stud_id_check(User_id):
         return ("Student")
     
-    elif Lec_id_check(User_id):
+    elif ex.Lec_id_check(User_id):
         return ("Lecturer")
     
-    elif Admin_id_check(User_id):
+    elif ex.Admin_id_check(User_id):
         return ("Admin")
     
     else:
@@ -73,7 +54,7 @@ def register_user():
 
 """The body for the request is 
 {
-    "User_id": "620123456",
+    "User_id": "621234567",
     password = "########"
 }
 """
@@ -85,13 +66,13 @@ def User_login():
     User_id = content['User_ID']
     print(User_id,content['Password'])
 
-    if Stud_id_check(User_id):
+    if ex.Stud_id_check(User_id):
         return ("Student")
     
-    elif Lec_id_check(User_id):
+    elif ex.Lec_id_check(User_id):
         return ("Lecturer")
     
-    elif Admin_id_check(User_id):
+    elif ex.Admin_id_check(User_id):
         return ("Admin")
     
     else:
@@ -113,7 +94,7 @@ def Create_Course():
     print(User_id,content['Password'])
     
     
-    if Admin_id_check(User_id):
+    if ex.Admin_id_check(User_id):
         return ("Admin")
     
     else:
@@ -129,20 +110,14 @@ def View_Courses(User_id):
 
     content = request.json
     
-    if Stud_id_check(User_id):
-        return View_Courses_by_Student(User_id)
+    if ex.Stud_id_check(User_id):
+        return ex.View_Courses_by_Student(User_id)
     
-    elif Lec_id_check(User_id):
-        return  View_Courses_by_Lecturer(User_id)
-    
+    elif ex.Lec_id_check(User_id):
+        return  ex.View_Courses_by_Lecturer(User_id)
 
-    def View_Courses_by_Student(User_id):
-        pass
-    
-    
-    def View_Courses_by_Lecturer(User_id):
-        pass
+
+
 
 if __name__ == '__main__':
     app.run(port=10000)
-

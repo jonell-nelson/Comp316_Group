@@ -45,35 +45,40 @@ def insert_person(type,num):
     if type == "Student":
         ids = [fake.unique.random_int(min=620000000, max=629999999) for _ in range(num)]
        
-        first = [fake.first_name() for x in range(0,num)]
-        last = [fake.last_name() for x in range(0,num)]
+        name = [fake.first_name() +" "+ fake.last_name() for x in range(0,num)]
+        email = [x+ "@uwi.mona.edu" for x in name]
+        role = [type for _ in range(num)]
 
-        data["StudentID"] = ids
-        data["First Name"] = first
-        data["Last Name"] = last
-                                
+        data["user_id"] = ids
+        data["name"] = name
+        data["email"] = email
+        data["role"] = role             
         return data
     
     elif type == "Lecturer":
         ids = [fake.unique.random_int(min=1000000, max=1009999) for _ in range(num)]
        
         name = [fake.name() for _ in range(0,num)]
+        email = [x + "@uwi.mona.edu" for x in name]
+        role = [type for _ in range(num)]
 
-        departs = [random.choice(subject_codes) for _ in range(0,num) ]
-        data["LecturerID"] = ids
-        data["Lecturer Name"] = name
-
+        data["user_id"] = ids
+        data["name"] = name
+        data["email"] = email
+        data["role"] = role 
         return data
     
     elif type == "Admin":
         ids = [fake.unique.random_int(min=99900000, max=99999999) for _ in range(num)]
        
         name = [fake.name() for _ in range(0,num)]
-
-        departs = [random.choice(subject_codes) for _ in range(0,num) ]
-        data["AdminID"] = ids
-        data["Admin Name"] = name
-
+        email = [x + "@uwi.mona.edu" for x in name]
+        role = [type for _ in range(num)]
+        
+        data["user_id"] = ids
+        data["name"] = name
+        data["email"] = email
+        data["role"] = role 
         return data
 
 def insert_course(num):
