@@ -35,3 +35,42 @@ JOIN StudentSubmission ss ON g.submission_id = ss.submission_id
 GROUP BY ss.user_id
 ORDER BY avg_grade DESC
 LIMIT 10;
+
+-- Minimun for lectuer
+SELECT uc.user_id, u.role, COUNT(*) AS course_count 
+FROM user_course uc
+JOIN user u ON uc.user_id = u.user_id
+WHERE u.role = 2
+GROUP BY uc.user_id, u.role
+order by COUNT(*) ASC
+limit 1 
+;
+
+-- Maximum course for student
+SELECT uc.user_id, u.role, COUNT(*) AS course_count 
+FROM user_course uc
+JOIN user u ON uc.user_id = u.user_id
+WHERE u.role = 3
+GROUP BY uc.user_id, u.role
+order by COUNT(*) ASC
+limit 1 
+;
+
+SELECT uc.user_id, u.role, COUNT(*) AS course_count 
+FROM user_course uc
+JOIN user u ON uc.user_id = u.user_id
+WHERE u.role = 2
+GROUP BY uc.user_id, u.role
+order by COUNT(*) DESC
+limit 1 
+;
+
+-- Maximum course for student
+SELECT uc.user_id, u.role, COUNT(*) AS course_count 
+FROM user_course uc
+JOIN user u ON uc.user_id = u.user_id
+WHERE u.role = 3
+GROUP BY uc.user_id, u.role
+order by COUNT(*) DESC
+limit 1 
+;

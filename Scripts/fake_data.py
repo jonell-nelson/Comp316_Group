@@ -245,15 +245,15 @@ def user_course_insert(register,sql,user_type):
 
 if __name__ == '__main__':
     print("Start")
-    students = insert_person("Student",1000)
-    lecturers = insert_person("Lecturer",70)
+    students = insert_person("Student",1000000)
+    lecturers = insert_person("Lecturer",100)
     admin = insert_person("Admin",30)
 
     students_pw = default_login(students["user_id"])
     lecturers_pw = default_login(lecturers["user_id"])
     admin_pw = default_login(admin["user_id"])
 
-    courses = insert_course(200)
+    courses = insert_course(300)
 
     Student_Register  = (Student_Course(students,courses))
     Lecturers_Register = Lecturers_course(lecturers,courses)
