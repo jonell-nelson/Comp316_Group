@@ -1,8 +1,3 @@
---CREATE database School_Management_System;
---use School_Management_System;
---source D:\Comp316_Group\Scripts\Create_SQL.sql
---exit; 
-
 CREATE DATABASE IF NOT EXISTS School_Management_System;
 USE School_Management_System
 

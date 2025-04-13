@@ -3,7 +3,19 @@ from faker import Faker
 import random 
 
 
-fake = Faker()  
+fake = Faker() 
+email_count = {} 
+def emails(name,num):
+    unique_emails = []
+    for i in range(num):
+        whole_name = name[i].replace(" ", "")
+        base = f"{whole_name}@uwi.mona.edu"
+        count = email_count.get(base, 0)
+
+        email = base if count == 0 else f"{whole_name}{count + 1}@uwi.mona.edu"
+        email_count[base] = count + 1
+        unique_emails.append(email)
+    return unique_emails
 
 course_names = {
         "COMP": ["Intro to Computing", "Data Structures", "Algorithms", "Operating Systems", "Software Engineering", "Database Systems", "Artificial Intelligence", "Computer Networks"],
@@ -43,16 +55,17 @@ subject_codes = [
 
 def insert_person(type,num):
     data = pd.DataFrame()
+    
     if type == "Student":
         ids = [fake.unique.random_int(min=620000000, max=629999999) for _ in range(num)]
        
         name = [fake.first_name() +" "+ fake.last_name() for x in range(0,num)]
-        email = [x+ "@uwi.mona.edu" for x in name]
+        unique_emails = emails(name,num)
         role = [type for _ in range(num)]
 
         data["user_id"] = ids
         data["name"] = name
-        data["email"] = email
+        data["email"] = unique_emails
         data["role"] = role             
         return data
     
@@ -60,12 +73,12 @@ def insert_person(type,num):
         ids = [fake.unique.random_int(min=1000000, max=1009999) for _ in range(num)]
        
         name = [fake.name() for _ in range(0,num)]
-        email = [x.replace(" ", "") + "@uwi.mona.edu" for x in name]
+        unique_emails = emails(name,num)
         role = [type for _ in range(num)]
 
         data["user_id"] = ids
         data["name"] = name
-        data["email"] = email
+        data["email"] = unique_emails
         data["role"] = role 
         return data
     
@@ -73,12 +86,12 @@ def insert_person(type,num):
         ids = [fake.unique.random_int(min=99900000, max=99999999) for _ in range(num)]
        
         name = [fake.name() for _ in range(0,num)]
-        email = [x + "@uwi.mona.edu" for x in name]
+        unique_emails = emails(name,num)
         role = [type for _ in range(num)]
         
         data["user_id"] = ids
         data["name"] = name
-        data["email"] = email
+        data["email"] = unique_emails
         data["role"] = role 
         return data
 
@@ -215,22 +228,23 @@ def user_insert(user,sql,user_type):
     sql.write(f"\n-- {user_type} User Inserts\n")
     for i in range(len(user["user_id"])):
         sql.write(
-            f"""INSERT INTO users (user_id,name,email,role) Values("{user["user_id"][i]}","{user["name"][i]}","{user["email"][i]}","{user["role"][i]}");\n""")
+            f"""INSERT INTO User(user_id,name,email,role) Values("{user["user_id"][i]}","{user["name"][i]}","{user["email"][i]}","{user["role"][i]}");\n""")
 
 def course_insert(course,sql):
     sql.write(f"\n-- Course Inserts\n")
     for i in range(len(course["Course ID"])):
         sql.write(
-            f"""INSERT INTO Course (course_id,course_name,course_code) Values("{course["Course ID"][i]}","{course["Course_Name"][i]}","{course["Course_Code"][i]}");\n""")
+            f"""INSERT INTO Course(course_id,course_name,course_code) Values("{course["Course ID"][i]}","{course["Course_Name"][i]}","{course["Course_Code"][i]}");\n""")
 
 def user_course_insert(register,sql,user_type):
     sql.write(f"\n-- {user_type} Course Inserts\n")
     for user in (register.keys()):
         for course in (register[user]):
             sql.write(
-            f"""INSERT INTO User_Course (user_id,course_id) Values("{user}","{course}");\n""")
+            f"""INSERT INTO User_Course(user_id,course_id) Values("{user}","{course}");\n""")
 
 if __name__ == '__main__':
+    print("Start")
     students = insert_person("Student",1000)
     lecturers = insert_person("Lecturer",70)
     admin = insert_person("Admin",30)
