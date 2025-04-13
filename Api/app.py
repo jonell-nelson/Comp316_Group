@@ -1,7 +1,12 @@
-from flask import Flask, request, make_response
-import extra.py as ex
+from flask import Flask, request, make_response, jsonify
+from helper.py import assign_role
 import mysql.connector
 import json
+from flask_jwt_extended import (
+    JWTManager, create_access_token, jwt_required,
+    get_jwt_identity, get_jwt
+)
+from datetime import timedelta
 
 with open('Configs\db_config.json', 'r') as f:
     db_config = json.load(f)
@@ -14,51 +19,38 @@ app = Flask(__name__)
 def hello_world():
     return "hello world"
 
-"""
-Rule for Users:
-1. Student Id start with 62
-2. Student Id is 9 digits
-3. Lecturer Id starts with 100
-4. Lecturer Id is 6 digits long
-5. Lecturer Id starts with 999
-6. Lecturer Id is 8 digits long
 
-"""
-
-"""The body for the request is 
-{
-    "User_Name"  : "######",
-    "User_id": "6201234567",
-    password = "########"
-}
-"""
-#This function creates a User and sets its type based on the format of the id number.
 @app.route('/register_user', methods=['Post'])
 def register_user():
+    try:
+        cnx = mysql.connector.connect(user=db_config["user"], 
+                                      password= db_config["password"],
+                                      host= db_config["host"],
+                                      database= db_config["database"]
+                                      )
+        cursor = cnx.cursor()
+        content = request.json
 
-    content = request.json
-    User_id = content['User_ID']
-    print(content['Password'])
+        User_id = int(content['user_id'])
+        Name = content["name"]
+        Email = content["email"]
+        Password = content["password"]
 
-    if ex.Stud_id_check(User_id):
-        return ("Student")
-    
-    elif ex.Lec_id_check(User_id):
-        return ("Lecturer")
-    
-    elif ex.Admin_id_check(User_id):
-        return ("Admin")
-    
-    else:
-        return "Invalid User ID"
+        Role = assign_role(User_id)
 
-"""The body for the request is 
-{
-    "User_id": "621234567",
-    password = "########"
-}
-"""
-#This function allows a user to login into one of three login pages based on the user id type.
+        cursor.execute(f"INSERT INTO User(user_id,name,email,password,role) VALUES({User_id},'{Name}',{Email},{Password},{Role})")
+        
+        cnx.commit()
+        cursor.close()
+        cnx.close()
+        return make_response(f"User {User_id} was sucessfully created", 200)
+    except ValueError:
+        return make_response(f"Invalid user id", 400)
+    except Exception as e:
+        return make_response({'error': str(e)}, 400)
+
+
+
 @app.route('/User_login', methods=['Get'])
 def User_login():
 
