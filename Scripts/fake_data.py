@@ -2,6 +2,7 @@ import pandas as pd
 from faker import Faker
 import random 
 
+
 fake = Faker()  
 
 course_names = {
@@ -59,7 +60,7 @@ def insert_person(type,num):
         ids = [fake.unique.random_int(min=1000000, max=1009999) for _ in range(num)]
        
         name = [fake.name() for _ in range(0,num)]
-        email = [x + "@uwi.mona.edu" for x in name]
+        email = [x.replace(" ", "") + "@uwi.mona.edu" for x in name]
         role = [type for _ in range(num)]
 
         data["user_id"] = ids
@@ -113,9 +114,9 @@ def insert_course(num):
 
     return data
 
-def Student_course(students,courses):
+def Student_Course(students,courses):
 
-    s_id = students["StudentID"].tolist()
+    s_id = students["user_id"].tolist()
     c_id = courses["Course ID"].tolist()
     S_C_num = [random.randint(3,6) for _ in range(len(s_id))]
 
@@ -157,7 +158,7 @@ def Student_course(students,courses):
     return (c_s_id_list)
 
 def Lecturers_course(lecturers,courses):
-    l_id = lecturers["LecturerID"].tolist()
+    l_id = lecturers["user_id"].tolist()
     c_id = courses["Course ID"].tolist()
     L_C_num = [random.randint(1,5) for _ in range(len(l_id))]
 
@@ -193,13 +194,70 @@ def Lecturers_course(lecturers,courses):
             
     return c_l_id_list
 
-if __name__ == '__main__':
+def default_login(users):
+    data = pd.DataFrame()
+    password= []
 
+    for user in users:
+        password.append(fake.password())
+    
+    data["user_id"] = users
+    data["password"] = password
+    return data
+
+def login_insert(user,sql,user_type):
+    sql.write(f"\n-- {user_type} Login Inserts\n")
+    for i in range(len(user["user_id"])):
+        sql.write(
+            f"""INSERT INTO Logins(user_id, user_password) Values("{user["user_id"][i]}","{user["password"][i]}");\n""")
+
+def user_insert(user,sql,user_type):
+    sql.write(f"\n-- {user_type} User Inserts\n")
+    for i in range(len(user["user_id"])):
+        sql.write(
+            f"""INSERT INTO users (user_id,name,email,role) Values("{user["user_id"][i]}","{user["name"][i]}","{user["email"][i]}","{user["role"][i]}");\n""")
+
+def course_insert(course,sql):
+    sql.write(f"\n-- Course Inserts\n")
+    for i in range(len(course["Course ID"])):
+        sql.write(
+            f"""INSERT INTO Course (course_id,course_name,course_code) Values("{course["Course ID"][i]}","{course["Course_Name"][i]}","{course["Course_Code"][i]}");\n""")
+
+def user_course_insert(register,sql,user_type):
+    sql.write(f"\n-- {user_type} Course Inserts\n")
+    for user in (register.keys()):
+        for course in (register[user]):
+            sql.write(
+            f"""INSERT INTO User_Course (user_id,course_id) Values("{user}","{course}");\n""")
+
+if __name__ == '__main__':
     students = insert_person("Student",1000)
     lecturers = insert_person("Lecturer",70)
     admin = insert_person("Admin",30)
+
+    students_pw = default_login(students["user_id"])
+    lecturers_pw = default_login(lecturers["user_id"])
+    admin_pw = default_login(admin["user_id"])
+
     courses = insert_course(200)
 
-    Student_Register  = (Student_course(students,courses))
-
+    Student_Register  = (Student_Course(students,courses))
     Lecturers_Register = Lecturers_course(lecturers,courses)
+
+    with open ("Scripts\\insert.sql","w") as sql:
+
+        user_insert(students,sql,"students")
+        user_insert(lecturers,sql,"lecturers")
+        user_insert(admin,sql,"admin")
+
+
+        login_insert(students_pw,sql,"students")
+        login_insert(lecturers_pw,sql,"lecturers")
+        login_insert(admin_pw,sql,"admin")
+
+        course_insert(courses,sql)
+
+        user_course_insert(Student_Register,sql,"students")
+        user_course_insert(Lecturers_Register,sql,"lecturers")
+
+    sql.close()

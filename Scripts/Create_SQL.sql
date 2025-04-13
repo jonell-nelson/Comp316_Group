@@ -1,3 +1,7 @@
+--CREATE database School_Management_System;
+--use School_Management_System;
+--source D:\Comp316_Group\Scripts\Create_SQL.sql
+--exit; 
 
 CREATE DATABASE IF NOT EXISTS School_Management_System;
 USE School_Management_System
@@ -17,14 +21,6 @@ CREATE TABLE Course (
     course_code VARCHAR(25) UNIQUE Not Null 
 );
 
-
-CREATE TABLE Logins (
-    user_id INT PRIMARY KEY,
-    password VARCHAR(255) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES User(user_id)
-        ON DELETE CASCADE ON UPDATE CASCADE
-);
-
 CREATE TABLE User_Course (
     user_id INT,
     course_id INT,
@@ -34,6 +30,15 @@ CREATE TABLE User_Course (
     FOREIGN KEY (course_id) REFERENCES Course(course_id)
         ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+CREATE TABLE Logins (
+    user_id INT PRIMARY KEY,
+    user_password VARCHAR(255) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES User(user_id)
+        ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+
 
 CREATE TABLE CalendarEvent (
     event_id INT PRIMARY KEY,
@@ -57,6 +62,10 @@ CREATE TABLE Forum (
     info TEXT
 );
 
+CREATE TABLE Thread (
+    thread_id INT PRIMARY KEY,
+    message_info TEXT
+);
 
 CREATE TABLE Course_Forum (
     forum_id INT,
@@ -68,11 +77,6 @@ CREATE TABLE Course_Forum (
         ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-
-CREATE TABLE Thread (
-    thread_id INT PRIMARY KEY,
-    message TEXT
-);
 
 CREATE TABLE Forum_Thread (
     thread_id INT,
@@ -203,3 +207,5 @@ CREATE TABLE Grade (
     FOREIGN KEY (submission_id) REFERENCES Submission(submission_id)
         ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+Show Tables;
