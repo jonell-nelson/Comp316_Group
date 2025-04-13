@@ -14,7 +14,7 @@ CREATE TABLE USER (
 CREATE TABLE Course (
     course_id INT PRIMARY KEY,
     course_name VARCHAR(100) Not Null,
-    course_code VARCHAR(20) UNIQUE Not Null,  
+    course_code VARCHAR(25) UNIQUE Not Null 
 );
 
 
@@ -71,11 +71,11 @@ CREATE TABLE Course_Forum (
 
 CREATE TABLE Thread (
     thread_id INT PRIMARY KEY,
-    message TEXT,
+    message TEXT
 );
 
 CREATE TABLE Forum_Thread (
-    thread_id INT PRIMARY KEY,
+    thread_id INT,
     forum_id INT,
     PRIMARY KEY (thread_id,forum_id),
     FOREIGN KEY (thread_id) REFERENCES Thread(thread_id)
@@ -85,9 +85,8 @@ CREATE TABLE Forum_Thread (
 );
 
 CREATE TABLE ThreadOwner (
-    thread_id INT PRIMARY KEY,
+    thread_id INT ,
     user_id INT,
-    PRIMARY KEY (thread_id,user_id),
     PRIMARY KEY (thread_id, user_id),
     FOREIGN KEY (thread_id) REFERENCES Thread(thread_id)
         ON DELETE CASCADE ON UPDATE CASCADE,
@@ -125,18 +124,17 @@ CREATE TABLE Thread_response (
 );
 
 
-
 CREATE TABLE Section (
     section_id INT PRIMARY KEY,
-    section_name VARCHAR(255),
+    section_name VARCHAR(255)
 );
 
 Create Table Content(
-    content_id INT,
+    content_id INT PRIMARY KEY,
     contentName VARCHAR(255),
     content_type VARCHAR(50),
     content_data_url TEXT
-)
+);
 
 
 Create Table SectionContent(
@@ -147,13 +145,13 @@ Create Table SectionContent(
         ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (section_id) REFERENCES Section(section_id)
         ON DELETE CASCADE ON UPDATE CASCADE
-)
+);
 
-CREATE TABLE CourseSection (
+CREATE TABLE SectionCourse (
     section_id INT,
     course_id INT,
     PRIMARY KEY (section_id, course_id),
-    FOREIGN KEY (section_id) REFERENCES CourseSection(section_id)
+    FOREIGN KEY (section_id) REFERENCES Section(section_id)
         ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (course_id) REFERENCES Course(course_id)
         ON DELETE CASCADE ON UPDATE CASCADE
